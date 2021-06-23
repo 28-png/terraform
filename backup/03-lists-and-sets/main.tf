@@ -1,5 +1,5 @@
 variable "names" {
-  default = ["ravs", "sats", "matt", "pat", "tom"]
+  default = ["matt", "pat", "tom"]
 }
 
 terraform {
