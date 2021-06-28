@@ -21,9 +21,23 @@ resource "aws_default_vpc" "default" {
   
 }
 
+data "aws_subnet_ids" "default_subnets" {
+  vpc_id = aws_default_vpc.default.id
+}
+
+data "aws_ami" "aws-linux-2-latest" {
+  most_recent = true
+  owners = ["amazon"]
+  filter {
+    name = "name"
+    values = ["amzn2-ami-hvm-*"]
+  }
+}
+
 resource "aws_security_group" "http_server_sg" {
   name   = "http_server_sg"
-  vpc_id = "vpc-0f2cb572"
+  //vpc_id = "vpc-0f2cb572"
+  vpc_id = aws_default_vpc.default.id
 
   ingress {
     from_port   = 80
@@ -57,7 +71,8 @@ resource "aws_instance" "http_server" {
   key_name               = "default-ec2"
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.http_server_sg.id]
-  subnet_id              = "subnet-b85d5bb6"
+  //subnet_id              = "subnet-b85d5bb6"
+  subnet_id = tolist(data.aws_subnet_ids.default_subnets.ids[0])
 
   connection {
     type        = "ssh"
